@@ -1,5 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Cơ bản -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Chủ đạo -->
+    <color name="primary">#92A3FD</color>
+    <color name="primary_light">#C58BF2</color>
+    <color name="secondary">#9DCEFF</color>
+
+    <!-- Text -->
+    <color name="text_primary">#1D1617</color>
+    <color name="text_secondary">#7B6F72</color>
+    <color name="text_tertiary">#ADA4A5</color>
+
+    <!-- Nền -->
+    <color name="background">#F7F8F8</color>
+    <color name="input_background">#F7F8F8</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- Xám -->
+    <color name="gray_light">#F7F8F8</color>
+    <color name="gray_medium">#DDDADA</color>
+    <color name="gray_dark">#7B6F72</color>
+
+    <!-- Trạng thái -->
+    <color name="success">#6AD39F</color>
+    <color name="warning">#F4C465</color>
+    <color name="error">#F38BA0</color>
+
+    <!-- Tab icon không chọn -->
+    <color name="tab_unselected">#ADA4A5</color>
+    <!-- Tab icon được chọn -->
+    <color name="tab_selected">#92A3FD</color>
 </resources>

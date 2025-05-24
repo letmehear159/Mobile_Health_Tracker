@@ -33,6 +33,13 @@ android {
 }
 
 dependencies {
+    implementation (libs.cloudinary.android)
+    implementation (libs.okhttp) // hỗ trợ upload file
+    implementation (libs.firebase.firestore)
+    implementation (libs.glide)
+    annotationProcessor (libs.compiler)
+
+    implementation (libs.viewpager2)
     implementation(platform(libs.firebase.bom))
     implementation (libs.firebase.database)
     implementation(libs.firebase.auth)
