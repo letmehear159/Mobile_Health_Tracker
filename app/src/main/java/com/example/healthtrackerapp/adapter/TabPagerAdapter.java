@@ -8,7 +8,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.example.healthtrackerapp.view.fragment.ImageFragment;
 import com.example.healthtrackerapp.view.fragment.ChartFragment;
 import com.example.healthtrackerapp.view.fragment.HomeFragment;
-import com.example.healthtrackerapp.view.fragment.ProfileFragment;
+import com.example.healthtrackerapp.view.fragment.AppointmentFragment;
 import com.example.healthtrackerapp.view.fragment.SearchFragment;
 
 public class TabPagerAdapter extends FragmentStateAdapter {
@@ -25,7 +25,7 @@ public class TabPagerAdapter extends FragmentStateAdapter {
             case 1: return new ChartFragment();
             case 2: return new SearchFragment();
             case 3: return new ImageFragment();
-            case 4: return new ProfileFragment();
+            case 4: return new AppointmentFragment();
             default: return new HomeFragment(); // fallback
         }
     }
