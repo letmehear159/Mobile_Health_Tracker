@@ -25,6 +25,8 @@
         </activity>
         <activity android:name=".view.activity.FullScreenImageActivity"
             android:theme="@style/Theme.HealthTrackerApp"/>
+        <activity android:name=".view.activity.CreateAppointmentActivity" />
+
 
     </application>
 
