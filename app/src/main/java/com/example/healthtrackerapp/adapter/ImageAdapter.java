@@ -34,15 +34,28 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String imageUrl = urls.get(position);
-        Glide.with(context).load(imageUrl).into(holder.imageView);
+        String fileUrl = urls.get(position);
 
-        holder.imageView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, FullScreenImageActivity.class);
-            intent.putExtra("imageUrl", imageUrl);
-            context.startActivity(intent);
-        });
+        if (fileUrl.endsWith(".pdf")) {
+            // Hiển thị icon PDF
+            holder.imageView.setImageResource(R.drawable.pdf); // cần thêm icon PDF vào drawable
+            holder.imageView.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(android.net.Uri.parse(fileUrl), "application/pdf");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                context.startActivity(intent);
+            });
+        } else {
+            // Hiển thị ảnh như cũ
+            Glide.with(context).load(fileUrl).into(holder.imageView);
+            holder.imageView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, FullScreenImageActivity.class);
+                intent.putExtra("imageUrl", fileUrl);
+                context.startActivity(intent);
+            });
+        }
     }
+
 
     @Override
     public int getItemCount() {

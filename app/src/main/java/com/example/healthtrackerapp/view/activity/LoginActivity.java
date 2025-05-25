@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -31,15 +32,24 @@ public class LoginActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(EmailPasswordViewModel.class);
 
-        EditText email = findViewById(R.id.loginEmail);
-        EditText password = findViewById(R.id.loginPassword);
-        Button login = findViewById(R.id.btn_login);
+        EditText email = findViewById(R.id.etLoginEmail);
+        EditText password = findViewById(R.id.etLoginPassword);
+        Button login = findViewById(R.id.btnLogin);
+        TextView registerTv = findViewById(R.id.tvRegister);
         login.setOnClickListener(v -> {
             viewModel.login(email.getText().toString(), password.getText().toString());
         });
 
+        registerTv.setOnClickListener(v -> {
+            Intent intent = new Intent(this, RegisterActivity.class);
+            startActivity(intent);
+        });
+
         viewModel.getUser().observe(this, user -> {
             Toast.makeText(this, "Logged in: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, TabLayoutActivity.class);
+            startActivity(intent);
+            finish();
         });
 
         viewModel.getError().observe(this, err -> {

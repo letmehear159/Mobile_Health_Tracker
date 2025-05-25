@@ -19,14 +19,15 @@ import java.util.Map;
 public class CloudinaryRepository {
 
     public void uploadFile(Context context, Uri fileUri) {
-//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        if (user == null) return;
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
 
-        String userId = "user.getUid();"; // Hoặc user.getEmail()
+        String userId = user.getUid();
         MediaManager.get().upload(fileUri)
                 .unsigned("HealthCheckerApp")
                 .option("folder", "health_images/" + userId)
-                .option("public_id", "img_" + System.currentTimeMillis())
+                .option("resource_type", "auto")
+                .option("public_id", "file_" + System.currentTimeMillis())
                 .callback(new UploadCallback() {
                     @Override
                     public void onStart(String requestId) {
@@ -40,20 +41,21 @@ public class CloudinaryRepository {
                     @Override
                     public void onSuccess(String requestId, Map resultData) {
                         String url = (String) resultData.get("secure_url");
+                        String format = (String) resultData.get("format"); // e.g., pdf, jpg, png
                         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        Map<String, Object> image = new HashMap<>();
-                        image.put("url", url);
-                        image.put("timestamp", FieldValue.serverTimestamp());
+                        Map<String, Object> fileData = new HashMap<>();
+                        fileData.put("url", url);
+                        fileData.put("type", format); // "pdf", "jpg", etc
+                        fileData.put("timestamp", FieldValue.serverTimestamp());
 
                         db.collection("users")
                                 .document(userId)
-                                .collection("images")
-                                .add(image)
+                                .collection("uploads") // dùng tên chung
+                                .add(fileData)
                                 .addOnSuccessListener(docRef -> Log.d("Cloudinary", "URL saved to Firestore"))
                                 .addOnFailureListener(e -> Log.e("Cloudinary", "Failed to save URL", e));
-                        // Optional: save url to Firestore or show in RecyclerView
                     }
 
                     @Override

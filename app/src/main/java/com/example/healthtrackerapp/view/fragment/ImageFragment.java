@@ -36,6 +36,10 @@ public class ImageFragment extends Fragment {
     private static final int REQUEST_IMAGE_PICK = 1001;
 
     private static final int REQUEST_PERMISSIONS = 123;
+
+    private static final int REQUEST_FILE_PICK = 2001; // mới
+
+
     ImageViewModel imageViewModel = new ImageViewModel();
 
     private RecyclerView recyclerView;
@@ -83,56 +87,68 @@ public class ImageFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_IMAGE_PICK && resultCode == Activity.RESULT_OK && data != null) {
+        if (requestCode == REQUEST_FILE_PICK && resultCode == Activity.RESULT_OK && data != null) {
             if (data.getClipData() != null) {
                 int count = data.getClipData().getItemCount();
                 for (int i = 0; i < count; i++) {
-                    Uri imageUri = data.getClipData().getItemAt(i).getUri();
-                    imageViewModel.uploadImageToCloudinary(requireContext(), imageUri);
+                    Uri fileUri = data.getClipData().getItemAt(i).getUri();
+                    imageViewModel.uploadImageToCloudinary(requireContext(), fileUri);
                 }
             } else if (data.getData() != null) {
-                Uri imageUri = data.getData();
-                imageViewModel.uploadImageToCloudinary(requireContext(), imageUri);
+                Uri fileUri = data.getData();
+                imageViewModel.uploadImageToCloudinary(requireContext(), fileUri);
             }
         }
     }
+
 
     private void checkAndRequestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_PERMISSIONS);
             } else {
-                openImagePicker();
+                openFilePicker();
             }
         } else {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS);
             } else {
-                openImagePicker();
+                openFilePicker();
             }
         }
     }
 
     private void loadImagesFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String userId = "g2mP177YViTU5wt4kiRvmAf2ZBx1";
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         db.collection("users")
                 .document(userId)
-                .collection("images")
+                .collection("uploads")  // hoặc "files" nếu bạn đã đổi tên
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    List<String> imageUrls = new ArrayList<>();
+                    List<String> fileUrls = new ArrayList<>();
                     for (DocumentSnapshot doc : querySnapshot) {
                         String url = doc.getString("url");
                         if (url != null) {
-                            imageUrls.add(url);
+                            fileUrls.add(url);  // Có thể là ảnh hoặc PDF
                         }
                     }
 
                     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-                    recyclerView.setAdapter(new ImageAdapter(getContext(), imageUrls));
+                    recyclerView.setAdapter(new ImageAdapter(getContext(), fileUrls));
                 });
+    }
+
+
+    private void openFilePicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        String[] mimeTypes = {"image/*", "application/pdf"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); // nếu muốn chọn nhiều
+        startActivityForResult(Intent.createChooser(intent, "Select files"), REQUEST_FILE_PICK);
     }
 }

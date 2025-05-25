@@ -12,15 +12,21 @@ public class UserRepository {
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     private DatabaseReference db = FirebaseDatabase.getInstance().getReference("users");
 
-    public void register(String email, String password, Consumer<FirebaseUser> onSuccess, Consumer<Exception> onFailure) {
+    public void register(String email, String password, String fullName,
+                         Consumer<FirebaseUser> onSuccess, Consumer<Exception> onFailure) {
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(result -> {
                     FirebaseUser user = result.getUser();
-                    db.child(user.getUid()).setValue(new User(user.getUid(), user.getEmail()));
-                    onSuccess.accept(user);
+                    if (user != null) {
+                        User userModel = new User(user.getUid(), user.getEmail(), fullName);
+                        db.child(user.getUid()).setValue(userModel)
+                                .addOnSuccessListener(unused -> onSuccess.accept(user))
+                                .addOnFailureListener(onFailure::accept);
+                    }
                 })
                 .addOnFailureListener(onFailure::accept);
     }
+
 
     public void login(String email, String password, Consumer<FirebaseUser> onSuccess, Consumer<Exception> onFailure) {
         auth.signInWithEmailAndPassword(email, password)

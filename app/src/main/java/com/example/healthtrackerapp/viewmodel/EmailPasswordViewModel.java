@@ -21,8 +21,8 @@ public class EmailPasswordViewModel extends ViewModel {
         return error;
     }
 
-    public void register(String email, String password) {
-        repo.register(email, password, user::postValue, e -> error.postValue(e.getMessage()));
+    public void register(String email, String password, String fullName) {
+        repo.register(email, password, fullName, user::postValue, e -> error.postValue(e.getMessage()));
     }
 
     public void login(String email, String password) {
