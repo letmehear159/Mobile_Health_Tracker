@@ -15,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ChatRepository {
     private static final String BASE_URL = "https://api.openai.com/";
-    private static final String API_KEY = ""; // Replace with your actual API key
+    private static final String API_KEY = "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\n"; // Replace with your actual API key
     private final OpenAIService openAIService;
 
     public ChatRepository() {
