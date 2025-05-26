@@ -1,15 +1,14 @@
 package com.example.healthtrackerapp.view.fragment;
 
-import com.example.healthtrackerapp.model.Appointment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.appcompat.app.AlertDialog;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,9 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.healthtrackerapp.R;
 import com.example.healthtrackerapp.adapter.AppointmentAdapter;
+import com.example.healthtrackerapp.model.Appointment;
 import com.example.healthtrackerapp.view.activity.CreateAppointmentActivity;
 import com.example.healthtrackerapp.viewmodel.AppointmentViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class AppointmentFragment extends Fragment {
 
@@ -35,6 +36,7 @@ public class AppointmentFragment extends Fragment {
 
         RecyclerView recyclerView = root.findViewById(R.id.recyclerAppointments);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         adapter = new AppointmentAdapter(new AppointmentAdapter.OnItemClickListener() {
             @Override
             public void onEdit(Appointment appointment) {
@@ -53,9 +55,7 @@ public class AppointmentFragment extends Fragment {
                 new AlertDialog.Builder(getContext())
                         .setTitle("Xác nhận")
                         .setMessage("Bạn có chắc muốn xóa lịch hẹn này?")
-                        .setPositiveButton("Xóa", (dialog, which) -> {
-                            viewModel.delete(appointment);
-                        })
+                        .setPositiveButton("Xóa", (dialog, which) -> viewModel.delete(appointment))
                         .setNegativeButton("Hủy", null)
                         .show();
             }
@@ -70,7 +70,10 @@ public class AppointmentFragment extends Fragment {
         });
 
         viewModel = new ViewModelProvider(this).get(AppointmentViewModel.class);
-        viewModel.getAllAppointments().observe(getViewLifecycleOwner(), appointments -> {
+
+        // 🔹 Lấy lịch hẹn của user hiện tại
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        viewModel.getAppointmentsForUser(currentUserId).observe(getViewLifecycleOwner(), appointments -> {
             adapter.setAppointments(appointments);
         });
 

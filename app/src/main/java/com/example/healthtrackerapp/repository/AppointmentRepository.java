@@ -11,16 +11,14 @@ import java.util.List;
 public class AppointmentRepository {
 
     private AppointmentDao appointmentDao;
-    private LiveData<List<Appointment>> allAppointments;
 
     public AppointmentRepository(Application application) {
         AppDatabase db = AppDatabase.getInstance(application);
         appointmentDao = db.appointmentDao();
-        allAppointments = appointmentDao.getAllAppointments();
     }
 
-    public LiveData<List<Appointment>> getAllAppointments() {
-        return allAppointments;
+    public LiveData<List<Appointment>> getAppointmentsForUser(String userId) {
+        return appointmentDao.getAppointmentsForUser(userId);
     }
 
     public void insert(Appointment appointment) {
@@ -34,5 +32,5 @@ public class AppointmentRepository {
     public void update(Appointment appointment) {
         AppDatabase.databaseWriteExecutor.execute(() -> appointmentDao.update(appointment));
     }
-
 }
+

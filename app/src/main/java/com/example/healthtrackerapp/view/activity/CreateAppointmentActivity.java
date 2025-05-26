@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.healthtrackerapp.R;
 import com.example.healthtrackerapp.model.Appointment;
 import com.example.healthtrackerapp.viewmodel.AppointmentViewModel;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -81,7 +82,10 @@ public class CreateAppointmentActivity extends AppCompatActivity {
             String ticket = etTicket.getText().toString();
 
             if (!doctor.isEmpty() && !date.isEmpty() && !time.isEmpty()) {
+                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 Appointment a = new Appointment(doctor, date, time, location, ticket);
+                a.userId = currentUserId;
+
                 if (editId != -1) {
                     a.id = editId;
                     viewModel.update(a);

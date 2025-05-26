@@ -11,7 +11,7 @@ import com.example.healthtrackerapp.model.Appointment;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Appointment.class}, version = 1)
+@Database(entities = {Appointment.class}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract AppointmentDao appointmentDao();

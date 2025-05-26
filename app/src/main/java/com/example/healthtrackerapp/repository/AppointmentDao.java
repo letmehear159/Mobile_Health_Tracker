@@ -17,8 +17,8 @@ public interface AppointmentDao {
     @Insert
     void insert(Appointment appointment);
 
-    @Query("SELECT * FROM appointments ORDER BY date ASC")
-    LiveData<List<Appointment>> getAllAppointments();
+    @Query("SELECT * FROM appointments WHERE userId = :userId ORDER BY date ASC")
+    LiveData<List<Appointment>> getAppointmentsForUser(String userId);
 
     @Delete
     void delete(Appointment appointment);
