@@ -1,8 +1,10 @@
 package com.example.healthtrackerapp.adapter;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,17 +33,37 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         ChatMessage message = messages.get(position);
         holder.messageText.setText(message.getMessage());
-        
-        // Set alignment based on message type
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.messageText.getLayoutParams();
+
+        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams) holder.messageText.getLayoutParams();
+        LinearLayout.LayoutParams iconParams = (LinearLayout.LayoutParams) holder.messageIcon.getLayoutParams();
+
+        // Set alignment and background based on message type
         if (message.getType() == ChatMessage.TYPE_USER) {
-            params.gravity = android.view.Gravity.END;
+            // User message (align right, show user icon)
+            ((LinearLayout) holder.itemView).setGravity(Gravity.END);
             holder.messageText.setBackgroundResource(R.drawable.chat_message_background_user);
+            holder.messageIcon.setImageResource(R.drawable.user_icon); // Replace with your user icon drawable
+            iconParams.leftMargin = 0; // No margin on the left
+            iconParams.rightMargin = 32; // Increased margin on the right
+            holder.messageIcon.setVisibility(View.VISIBLE);
+
         } else {
-            params.gravity = android.view.Gravity.START;
+            // Bot message (align left, show bot icon)
+            ((LinearLayout) holder.itemView).setGravity(Gravity.START);
             holder.messageText.setBackgroundResource(R.drawable.chat_message_background_bot);
+            holder.messageIcon.setImageResource(R.drawable.bot_icon); // Replace with your bot icon drawable
+            iconParams.leftMargin = 32; // Increased margin on the left
+            iconParams.rightMargin = 32; // No margin on the right
+            holder.messageIcon.setVisibility(View.VISIBLE);
         }
-        holder.messageText.setLayoutParams(params);
+
+        holder.messageText.setLayoutParams(textParams);
+        holder.messageIcon.setLayoutParams(iconParams);
+
+        // Optional: Hide icon for loading message if you don't have a loading icon
+        if (message == loadingMessage) {
+             holder.messageIcon.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -74,10 +96,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
     static class MessageViewHolder extends RecyclerView.ViewHolder {
         TextView messageText;
+        ImageView messageIcon;
 
         MessageViewHolder(View itemView) {
             super(itemView);
             messageText = itemView.findViewById(R.id.messageText);
+            messageIcon = itemView.findViewById(R.id.messageIcon);
         }
     }
 }

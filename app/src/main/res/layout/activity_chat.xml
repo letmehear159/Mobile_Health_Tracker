@@ -10,12 +10,13 @@
         android:id="@+id/toolbarChat"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/purple_light"
+        android:background="@color/primary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:layout_constraintTop_toTopOf="parent"
         app:title="Health Assistant"
-        app:titleTextColor="@android:color/white" />
+        app:titleTextColor="@android:color/white"
+        android:paddingTop="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecyclerView"
@@ -49,6 +50,7 @@
                 android:hint="Type your message..."
                 android:inputType="textMultiLine"
                 android:maxLines="4"
+                android:minHeight="48dp"
                 android:padding="8dp" />
 
             <ImageButton
@@ -58,7 +60,8 @@
                 android:layout_gravity="bottom"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_send"
-                android:tint="@color/design_default_color_primary" />
+                android:contentDescription="Send message button"
+                app:tint="@color/primary" />
 
         </LinearLayout>
 
