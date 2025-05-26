@@ -2,27 +2,31 @@ package com.example.healthtrackerapp.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.healthtrackerapp.R;
+import com.example.healthtrackerapp.model.FileItem;
 import com.example.healthtrackerapp.view.activity.FullScreenImageActivity;
 
+import java.util.Date;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
-    private List<String> urls;
+    private List<FileItem> items;
     private Context context;
 
-    public ImageAdapter(Context context, List<String> urls) {
+    public ImageAdapter(Context context, List<FileItem> items) {
         this.context = context;
-        this.urls = urls;
+        this.items = items;
     }
 
     @NonNull
@@ -34,10 +38,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String fileUrl = urls.get(position);
+        FileItem item = items.get(position);
+        String fileUrl = item.getUrl();
+
+        // Hiển thị tên file và thời gian
+        holder.fileNameText.setText(item.getName() != null ? item.getName() : "Không rõ tên");
+        String formattedDate = DateFormat.format("dd/MM/yyyy HH:mm", new Date(item.getTimestampMillis())).toString();
+        holder.fileDateText.setText(formattedDate);
 
         if (fileUrl.endsWith(".pdf")) {
-            // Hiển thị icon PDF
             holder.imageView.setImageResource(R.drawable.pdf); // cần thêm icon PDF vào drawable
             holder.imageView.setOnClickListener(v -> {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -46,7 +55,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 context.startActivity(intent);
             });
         } else {
-            // Hiển thị ảnh như cũ
             Glide.with(context).load(fileUrl).into(holder.imageView);
             holder.imageView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, FullScreenImageActivity.class);
@@ -56,18 +64,20 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
     }
 
-
     @Override
     public int getItemCount() {
-        return urls.size();
+        return items.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
+        TextView fileNameText, fileDateText;
 
         public ViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.img_view);
+            fileNameText = itemView.findViewById(R.id.file_name);
+            fileDateText = itemView.findViewById(R.id.file_date);
         }
     }
 }

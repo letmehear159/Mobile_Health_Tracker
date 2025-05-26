@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,39 +34,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImageFragment extends Fragment {
-    private static final int REQUEST_IMAGE_PICK = 1001;
-
     private static final int REQUEST_PERMISSIONS = 123;
 
     private static final int REQUEST_FILE_PICK = 2001; // mới
-
-
-    ImageViewModel imageViewModel = new ImageViewModel();
+    private ImageViewModel imageViewModel;
 
     private RecyclerView recyclerView;
     private FloatingActionButton uploadBtn;
 
-    private void openImagePicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); // Cho phép chọn nhiều ảnh
-        startActivityForResult(Intent.createChooser(intent, "Select Pictures"), REQUEST_IMAGE_PICK);
-    }
 
     public ImageFragment() {
         super(R.layout.fragment_upload_images);
     }
 
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//
-//        uploadBtn = view.findViewById(R.id.btn_upload);
-//
-//        uploadBtn.setOnClickListener(v -> {
-//            checkAndRequestPermissions();
-//        });
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +59,16 @@ public class ImageFragment extends Fragment {
             checkAndRequestPermissions();
         });
 
-        loadImagesFromFirestore();
+        imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class); // gán vào field
+
+
+        imageViewModel.getFileItems().observe(getViewLifecycleOwner(), urls -> {
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+            recyclerView.setAdapter(new ImageAdapter(getContext(), urls));
+        });
+
+        imageViewModel.loadImagesFromFirestore();
+
 
         return view;
     }
@@ -92,14 +82,15 @@ public class ImageFragment extends Fragment {
                 int count = data.getClipData().getItemCount();
                 for (int i = 0; i < count; i++) {
                     Uri fileUri = data.getClipData().getItemAt(i).getUri();
-                    imageViewModel.uploadImageToCloudinary(requireContext(), fileUri);
+                    promptForFileNameAndUpload(fileUri); // <-- dialog nhập tên cho từng file
                 }
             } else if (data.getData() != null) {
                 Uri fileUri = data.getData();
-                imageViewModel.uploadImageToCloudinary(requireContext(), fileUri);
+                promptForFileNameAndUpload(fileUri); // <-- dialog nhập tên
             }
         }
     }
+
 
 
     private void checkAndRequestPermissions() {
@@ -118,29 +109,6 @@ public class ImageFragment extends Fragment {
         }
     }
 
-    private void loadImagesFromFirestore() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        db.collection("users")
-                .document(userId)
-                .collection("uploads")  // hoặc "files" nếu bạn đã đổi tên
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<String> fileUrls = new ArrayList<>();
-                    for (DocumentSnapshot doc : querySnapshot) {
-                        String url = doc.getString("url");
-                        if (url != null) {
-                            fileUrls.add(url);  // Có thể là ảnh hoặc PDF
-                        }
-                    }
-
-                    recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-                    recyclerView.setAdapter(new ImageAdapter(getContext(), fileUrls));
-                });
-    }
-
 
     private void openFilePicker() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -151,4 +119,24 @@ public class ImageFragment extends Fragment {
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); // nếu muốn chọn nhiều
         startActivityForResult(Intent.createChooser(intent, "Select files"), REQUEST_FILE_PICK);
     }
+
+
+    private void promptForFileNameAndUpload(Uri fileUri) {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+        builder.setTitle("Nhập tên file");
+
+        final android.widget.EditText input = new android.widget.EditText(requireContext());
+        input.setHint("VD: Ket_qua_xet_nghiem.pdf");
+        builder.setView(input);
+
+        builder.setPositiveButton("Tải lên", (dialog, which) -> {
+            String customName = input.getText().toString().trim();
+            imageViewModel.uploadImageToCloudinary(requireContext(), fileUri, customName);
+        });
+
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
 }

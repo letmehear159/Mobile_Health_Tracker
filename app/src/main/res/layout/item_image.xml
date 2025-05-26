@@ -1,6 +1,42 @@
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/img_view"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="8dp"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
-    android:scaleType="centerCrop"
-    android:layout_margin="8dp" />
+    android:layout_height="wrap_content">
+
+    <!-- Hiển thị ảnh hoặc PDF preview -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginBottom="8dp">
+
+        <!-- Ảnh -->
+        <ImageView
+            android:id="@+id/img_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:visibility="visible" />
+
+    </FrameLayout>
+
+    <!-- Tên file -->
+    <TextView
+        android:id="@+id/file_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tên file"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1" />
+
+    <!-- Ngày lưu -->
+    <TextView
+        android:id="@+id/file_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ngày lưu"
+        android:textSize="12sp"
+        android:textColor="#666" />
+</LinearLayout>
