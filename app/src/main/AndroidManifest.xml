@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MyApplication"
@@ -29,7 +30,10 @@
             android:theme="@style/Theme.HealthTrackerApp" />
         <activity android:name=".view.activity.TabLayoutActivity" />
         <activity android:name=".view.activity.RegisterActivity" />
-
+        <activity
+            android:name=".view.activity.ChatActivity"
+            android:exported="false"
+            android:label="Health Assistant" />
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.example.healthtrackerapp.view.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.healthtrackerapp.R;
 import com.example.healthtrackerapp.adapter.TabPagerAdapter;
 import com.example.healthtrackerapp.manager.CloudinaryManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -20,6 +22,7 @@ public class TabLayoutActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
     private TabPagerAdapter adapter;
+    private FloatingActionButton fabChat;
 
     private final int[] tabIcons = {
             R.drawable.home,
@@ -36,6 +39,7 @@ public class TabLayoutActivity extends AppCompatActivity {
 
         tabLayout = findViewById(R.id.tabLayout);
         viewPager = findViewById(R.id.viewPager);
+        fabChat = findViewById(R.id.fabChat);
 
         adapter = new TabPagerAdapter(this);
         viewPager.setAdapter(adapter);
@@ -45,6 +49,12 @@ public class TabLayoutActivity extends AppCompatActivity {
         }).attach();
         // Sau khi attach -> gắn icon và hiệu ứng
         setupTabIcons();
+
+        // Setup chat button click listener
+        fabChat.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ChatActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void setupTabIcons() {

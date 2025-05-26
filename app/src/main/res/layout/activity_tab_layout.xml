@@ -1,28 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- ViewPager chiếm phần còn lại bên trên -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <!-- TabLayout nằm dưới cùng -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
+        <!-- ViewPager chiếm phần còn lại bên trên -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- TabLayout nằm dưới cùng -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:paddingVertical="20dp"
+            app:tabIndicatorColor="#92A3FD"
+            app:tabTextColor="#ADA4A5"
+            app:tabSelectedTextColor="#92A3FD"
+            app:tabMode="fixed"
+            app:tabGravity="fill" />
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabChat"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:paddingVertical="20dp"
-        app:tabIndicatorColor="#92A3FD"
-        app:tabTextColor="#ADA4A5"
-        app:tabSelectedTextColor="#92A3FD"
-        app:tabMode="fixed"
-        app:tabGravity="fill" />
-</LinearLayout>
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
+        android:contentDescription="Open chat"
+        app:srcCompat="@android:drawable/ic_dialog_email"
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/purple_light" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

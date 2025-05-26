@@ -14,4 +14,4 @@ public interface OpenAIService {
         @Header("Authorization") String authorization,
         @Body ChatRequest request
     );
-} 
+}
