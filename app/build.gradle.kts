@@ -37,6 +37,8 @@ dependencies {
     implementation (libs.okhttp) // hỗ trợ upload file
     implementation (libs.firebase.firestore)
     implementation (libs.glide)
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
     annotationProcessor (libs.compiler)
 
 
