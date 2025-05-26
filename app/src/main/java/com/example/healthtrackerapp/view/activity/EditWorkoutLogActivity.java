@@ -1,4 +1,4 @@
-package com.example.healthtrackerapp;
+package com.example.healthtrackerapp.view.activity;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.healthtrackerapp.R;
 import com.example.healthtrackerapp.model.WorkoutLog;
 import com.example.healthtrackerapp.viewmodel.WorkoutLogViewModel;
 import com.google.android.material.button.MaterialButton;

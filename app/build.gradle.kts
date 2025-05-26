@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -32,7 +33,18 @@ android {
 }
 
 dependencies {
+    implementation (libs.cloudinary.android)
+    implementation (libs.okhttp) // hỗ trợ upload file
+    implementation (libs.firebase.firestore)
+    implementation (libs.glide)
+    implementation(libs.firebase.common)
+    annotationProcessor (libs.compiler)
 
+    implementation (libs.viewpager2)
+    implementation(platform(libs.firebase.bom))
+    implementation (libs.firebase.database)
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
