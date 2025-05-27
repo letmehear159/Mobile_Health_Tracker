@@ -33,4 +33,6 @@
     <color name="tab_unselected">#ADA4A5</color>
     <!-- Tab icon được chọn -->
     <color name="tab_selected">#92A3FD</color>
+
+    <color name="purple_light">#A78BFA</color>
 </resources>
