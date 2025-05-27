@@ -1,5 +1,6 @@
 [versions]
-agp = "8.9.2"
+agp = "8.8.1"
+#agp = "8.9.2"
 cloudinaryAndroid = "2.3.1"
 compiler = "4.16.0"
 firebaseAuth = "23.2.1"
@@ -15,6 +16,7 @@ constraintlayout = "2.1.4"
 okhttp = "4.12.0"
 playServicesAuth = "21.3.0"
 viewpager2 = "1.1.0"
+firebaseCommon = "21.0.0"
 room = "2.7.1"
 
 
@@ -38,6 +40,7 @@ play-services-auth = { module = "com.google.android.gms:play-services-auth", ver
 viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+firebase-common = { group = "com.google.firebase", name = "firebase-common", version.ref = "firebaseCommon" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

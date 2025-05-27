@@ -25,9 +25,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activity.FullScreenImageActivity"
-            android:theme="@style/Theme.HealthTrackerApp"/>
-        <activity android:name=".view.activity.CreateAppointmentActivity" />
+        <activity
+            android:name=".view.activity.AddWorkoutLogActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activity.EditWorkoutLogActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activity.FullScreenImageActivity"
+            android:theme="@style/Theme.HealthTrackerApp" />
         <activity android:name=".view.activity.TabLayoutActivity" />
         <activity android:name=".view.activity.RegisterActivity" />
         <activity
