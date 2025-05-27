@@ -15,7 +15,7 @@
             android:id="@+id/addWorkoutTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Thêm Workout Log"
+            android:text="Chọn hoạt động"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#333333"
@@ -24,13 +24,14 @@
             app:layout_constraintTop_toTopOf="parent"/>
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/workoutTypeCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/addWorkoutTitle"
             app:cardElevation="4dp"
             app:cardCornerRadius="16dp"
             app:cardBackgroundColor="@android:color/white"
-            android:layout_marginBottom="32dp">
+            android:layout_marginBottom="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -38,138 +39,129 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <com.google.android.material.textfield.TextInputLayout
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:hint="Ngày"
-                    app:boxStrokeColor="#92A3FD"
-                    app:hintTextColor="#92A3FD"
-                    app:boxBackgroundColor="#F8F9FF"
-                    app:endIconMode="custom"
-                    app:endIconDrawable="@android:drawable/ic_menu_my_calendar"
-                    app:endIconTint="#92A3FD"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:text="Loại hoạt động"
+                    android:textSize="16sp"
+                    android:textColor="#666666"
+                    android:layout_marginBottom="8dp"/>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/dateInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:textSize="16sp"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:cursorVisible="false"
-                        android:inputType="none"/>
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
+                <Spinner
+                    android:id="@+id/workoutTypeSpinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:hint="Loại bài tập"
-                    app:boxStrokeColor="#92A3FD"
-                    app:hintTextColor="#92A3FD"
-                    app:boxBackgroundColor="#F8F9FF"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/workoutTypeInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:textSize="16sp"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:hint="Thời gian (phút)"
-                    app:boxStrokeColor="#92A3FD"
-                    app:hintTextColor="#92A3FD"
-                    app:boxBackgroundColor="#F8F9FF"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/durationInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:textColor="#333333"
-                        android:textSize="16sp"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:hint="Calo"
-                    app:boxStrokeColor="#92A3FD"
-                    app:hintTextColor="#92A3FD"
-                    app:boxBackgroundColor="#F8F9FF"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/caloriesInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:textColor="#333333"
-                        android:textSize="16sp"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:hint="Số bước (tùy chọn)"
-                    app:boxStrokeColor="#92A3FD"
-                    app:hintTextColor="#92A3FD"
-                    app:boxBackgroundColor="#F8F9FF"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/stepsInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:textColor="#333333"
-                        android:textSize="16sp"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="32dp"
-                    android:hint="Ghi chú (tùy chọn)"
-                    app:boxStrokeColor="#92A3FD"
-                    app:hintTextColor="#92A3FD"
-                    app:boxBackgroundColor="#F8F9FF"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/notesInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:textSize="16sp"
-                        android:minLines="2"
-                        android:gravity="top"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:background="@drawable/spinner_background"
+                    android:padding="12dp"
+                    android:layout_marginBottom="24dp"/>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/saveButton"
+                    android:id="@+id/startTrackingButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="Lưu"
+                    android:text="Bắt đầu theo dõi"
                     android:textSize="16sp"
                     android:textColor="@android:color/white"
                     app:backgroundTint="@null"
                     android:background="@drawable/gradient_button_background"
                     app:cornerRadius="28dp"
                     app:elevation="4dp"/>
+
+                <TextView
+                    android:id="@+id/statusText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textAlignment="center"
+                    android:textColor="#666666"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/statsCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/workoutTypeCard"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thống kê"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#666666" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Số bước"
+                            android:textSize="14sp"
+                            android:textColor="#666666" />
+
+                        <TextView
+                            android:id="@+id/stepsText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#333333"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Calories"
+                            android:textSize="14sp"
+                            android:textColor="#666666" />
+
+                        <TextView
+                            android:id="@+id/caloriesText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#333333"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
