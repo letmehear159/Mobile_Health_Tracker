@@ -21,12 +21,19 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.healthtrackerapp.R;
+import com.example.healthtrackerapp.model.WorkoutLog;
 import com.example.healthtrackerapp.service.WorkoutTrackingService;
+import com.example.healthtrackerapp.viewmodel.WorkoutLogViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class AddWorkoutLogActivity extends AppCompatActivity {
     private static final String TAG = "AddWorkoutLogActivity";
@@ -35,6 +42,7 @@ public class AddWorkoutLogActivity extends AppCompatActivity {
     private static final String EXTRA_CALORIES = "calories";
     private static final String EXTRA_DURATION = "duration";
 
+    private WorkoutLogViewModel viewModel;
     private Spinner workoutTypeSpinner;
     private MaterialButton startTrackingButton;
     private FloatingActionButton addManualButton;
@@ -68,6 +76,9 @@ public class AddWorkoutLogActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_workout_log);
+
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(this).get(WorkoutLogViewModel.class);
 
         // Initialize sensor manager
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -219,6 +230,28 @@ public class AddWorkoutLogActivity extends AppCompatActivity {
         Log.d(TAG, "Stopping tracking");
         Intent serviceIntent = new Intent(this, WorkoutTrackingService.class);
         stopService(serviceIntent);
+
+        // Create new WorkoutLog from tracking data
+        String selectedWorkoutType = workoutTypeSpinner.getSelectedItem().toString();
+        int steps = Integer.parseInt(stepsText.getText().toString());
+        int calories = Integer.parseInt(caloriesText.getText().toString());
+        int duration = Integer.parseInt(statusText.getText().toString().replaceAll("[^0-9]", ""));
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String currentDate = dateFormat.format(new Date());
+
+        WorkoutLog newLog = new WorkoutLog(
+            0, // ID will be auto-generated
+            currentDate,
+            selectedWorkoutType,
+            duration,
+            calories,
+            steps,
+            "Tự động theo dõi (Accelerometer)"
+        );
+
+        // Use ViewModel to save the log
+        viewModel.insertWorkoutLog(newLog);
 
         isTracking = false;
         startTrackingButton.setText("Bắt đầu theo dõi");

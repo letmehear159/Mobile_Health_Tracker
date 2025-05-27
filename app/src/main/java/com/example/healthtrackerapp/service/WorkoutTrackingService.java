@@ -21,7 +21,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.healthtrackerapp.R;
-import com.example.healthtrackerapp.database.DatabaseHelper;
 import com.example.healthtrackerapp.model.WorkoutLog;
 import com.example.healthtrackerapp.view.activity.AddWorkoutLogActivity;
 
@@ -71,7 +70,6 @@ public class WorkoutTrackingService extends Service implements SensorEventListen
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
-    private DatabaseHelper dbHelper;
     private String workoutType;
     private int totalSteps = 0;
     private long startTime;
@@ -84,7 +82,6 @@ public class WorkoutTrackingService extends Service implements SensorEventListen
         super.onCreate();
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        dbHelper = new DatabaseHelper(this);
         createNotificationChannel();
         Log.d(TAG, "Service created");
     }
@@ -148,24 +145,7 @@ public class WorkoutTrackingService extends Service implements SensorEventListen
                     + ", Calories: " + calories
                     + ", Duration: " + durationMinutes);
 
-            // Save workout log
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            String currentDate = dateFormat.format(new Date());
-
-            WorkoutLog log = new WorkoutLog(
-                    0, // ID auto-generated
-                    currentDate,
-                    workoutType,
-                    durationMinutes,
-                    calories,
-                    totalSteps,
-                    "Tự động theo dõi (Accelerometer)"
-            );
-
-            dbHelper.insertWorkoutLog(log);
-            Log.d(TAG, "Workout log saved to database");
-
-            // Stop the service
+            // Stop the service - Note: Saving is now handled by AddWorkoutLogActivity
             stopForeground(true);
             stopSelf();
             Log.d(TAG, "Service stopped");
