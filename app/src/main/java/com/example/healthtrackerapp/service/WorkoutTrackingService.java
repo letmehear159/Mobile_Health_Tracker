@@ -27,8 +27,10 @@ import com.example.healthtrackerapp.view.activity.AddWorkoutLogActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Queue;
 
 public class WorkoutTrackingService extends Service implements SensorEventListener {
@@ -36,24 +38,42 @@ public class WorkoutTrackingService extends Service implements SensorEventListen
     private static final String CHANNEL_ID = "WorkoutTrackingChannel";
     private static final int NOTIFICATION_ID = 1;
 
-    // Constants for step detection
-    private static final float STEP_THRESHOLD = 8.0f; // Tuned for walking
-    private static final float RESET_THRESHOLD = STEP_THRESHOLD * 0.2f; // Reset at 20% of threshold
-    private static final int STEP_DELAY_NS = 250000000; // 250 ms for walking cadence
-    private static final int WINDOW_SIZE = 5; // Smooth over 5 samples
-    private static final float ALPHA = 0.8f; // Stronger low-pass filter
+    // Constants for different workout types
+    private static class WorkoutParameters {
+        final float threshold;    // Ngưỡng phát hiện bước
+        final int minStepDelay;   // Thời gian tối thiểu giữa các bước (ms)
+
+        WorkoutParameters(float threshold, int minStepDelay) {
+            this.threshold = threshold;
+            this.minStepDelay = minStepDelay;
+        }
+    }
+
+    // Parameters for different workout types
+    private static final Map<String, WorkoutParameters> WORKOUT_PARAMS = new HashMap<String, WorkoutParameters>() {{
+        // Walking: Ngưỡng vừa phải, nhịp độ chậm
+        put("Walking", new WorkoutParameters(10.0f, 300));
+
+        // Running: Ngưỡng cao hơn, nhịp độ nhanh
+        put("Running", new WorkoutParameters(15.0f, 200));
+
+        // Cycling: Ngưỡng thấp, nhịp độ rất nhanh
+        put("Cycling", new WorkoutParameters(8.0f, 150));
+    }};
+
+    // Current workout parameters
+    private WorkoutParameters currentParams;
+    private float threshold;
+    private int minStepDelay;
+    private long lastStepTime;
+    private boolean isPeak = false;
+    private float lastAcceleration = 0;
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private DatabaseHelper dbHelper;
     private String workoutType;
     private int totalSteps = 0;
-    private long lastStepTimeNs = 0;
-    private float lastMagnitude = 0;
-    private boolean isPeak = false;
-    private Queue<Float> magnitudeWindow = new LinkedList<>();
-    private float[] gravity = new float[3];
-    private float[] linearAcceleration = new float[3];
     private long startTime;
     private boolean isTracking = false;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -87,14 +107,15 @@ public class WorkoutTrackingService extends Service implements SensorEventListen
             isTracking = true;
             startTime = System.currentTimeMillis();
             totalSteps = 0;
-            lastStepTimeNs = 0;
-            lastMagnitude = 0;
+            lastStepTime = 0;
             durationMinutes = 0;
-            magnitudeWindow.clear(); // Clear window on start
+
+            // Update parameters based on workout type
+            updateWorkoutParameters(workoutType);
 
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
             startForeground(NOTIFICATION_ID, createNotification());
-            updateNotification(); // Send initial stats
+            updateNotification();
             Log.d(TAG, "Service started in foreground with accelerometer");
 
             // Start duration tracking
@@ -225,67 +246,52 @@ public class WorkoutTrackingService extends Service implements SensorEventListen
         Log.d(TAG, "Broadcast sent successfully");
     }
 
+    private void updateWorkoutParameters(String type) {
+        currentParams = WORKOUT_PARAMS.getOrDefault(type, WORKOUT_PARAMS.get("Walking"));
+        threshold = currentParams.threshold;
+        minStepDelay = currentParams.minStepDelay;
+        lastStepTime = 0;
+        isPeak = false;
+        lastAcceleration = 0;
+
+        Log.d(TAG, String.format("Updated parameters for %s - Threshold: %.1f, MinDelay: %dms",
+            type, threshold, minStepDelay));
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            // Apply low-pass filter
-            gravity[0] = ALPHA * gravity[0] + (1 - ALPHA) * event.values[0];
-            gravity[1] = ALPHA * gravity[1] + (1 - ALPHA) * event.values[1];
-            gravity[2] = ALPHA * gravity[2] + (1 - ALPHA) * event.values[2];
+            // Tính tổng gia tốc (bỏ qua trọng lực)
+            float acceleration = (float) Math.sqrt(
+                event.values[0] * event.values[0] +
+                event.values[1] * event.values[1] +
+                event.values[2] * event.values[2]
+            ) - 9.8f; // Trừ đi gia tốc trọng trường
 
-            // Remove gravity contribution
-            linearAcceleration[0] = event.values[0] - gravity[0];
-            linearAcceleration[1] = event.values[1] - gravity[1];
-            linearAcceleration[2] = event.values[2] - gravity[2];
-
-            // Calculate magnitude
-            float magnitude = (float) Math.sqrt(
-                    linearAcceleration[0] * linearAcceleration[0] +
-                            linearAcceleration[1] * linearAcceleration[1] +
-                            linearAcceleration[2] * linearAcceleration[2]
-            );
-
-            // Focus on z-axis for walking
-            float zAcceleration = Math.abs(linearAcceleration[2]);
-
-            // Add to sliding window
-            magnitudeWindow.add(magnitude);
-            if (magnitudeWindow.size() > WINDOW_SIZE) {
-                magnitudeWindow.poll();
+            // Log dữ liệu khi có chuyển động đáng kể
+            if (acceleration > threshold * 0.5f) {
+                Log.d(TAG, String.format("%s - Accel: %.2f Steps: %d",
+                    workoutType, acceleration, totalSteps));
             }
 
-            // Calculate average magnitude
-            float avgMagnitude = 0;
-            for (float m : magnitudeWindow) {
-                avgMagnitude += m;
-            }
-            avgMagnitude /= magnitudeWindow.size();
-
-            // Log sensor data for debugging
-            if (zAcceleration > STEP_THRESHOLD * 0.5f || avgMagnitude > STEP_THRESHOLD * 0.5f) {
-                Log.d(TAG, String.format("Raw - X: %.2f, Y: %.2f, Z: %.2f | Linear - X: %.2f, Y: %.2f, Z: %.2f | Magnitude: %.2f, Z-Accel: %.2f, Steps: %d",
-                        event.values[0], event.values[1], event.values[2],
-                        linearAcceleration[0], linearAcceleration[1], linearAcceleration[2],
-                        avgMagnitude, zAcceleration, totalSteps));
-            }
-
-            // Detect step (combine magnitude and z-axis)
-            if (avgMagnitude > STEP_THRESHOLD && zAcceleration > STEP_THRESHOLD * 0.7f && !isPeak) {
+            // Phát hiện bước đơn giản dựa trên đỉnh gia tốc
+            if (acceleration > threshold && !isPeak) {
                 isPeak = true;
-                long currentTimeNs = event.timestamp;
+                long currentTime = System.currentTimeMillis();
 
-                if (currentTimeNs - lastStepTimeNs > STEP_DELAY_NS) {
+                // Kiểm tra thời gian giữa các bước
+                if (currentTime - lastStepTime > minStepDelay) {
                     totalSteps++;
-                    lastStepTimeNs = currentTimeNs;
-                    Log.d(TAG, String.format("Step detected! Z-Accel: %.2f, Magnitude: %.2f, Total steps: %d",
-                            zAcceleration, avgMagnitude, totalSteps));
+                    lastStepTime = currentTime;
+                    Log.d(TAG, String.format("%s step detected! Accel: %.2f Total: %d",
+                        workoutType, acceleration, totalSteps));
                     updateNotification();
                 }
-            } else if (avgMagnitude < RESET_THRESHOLD && zAcceleration < RESET_THRESHOLD) {
+            } else if (acceleration < threshold * 0.5f) {
                 isPeak = false;
             }
 
-            lastMagnitude = avgMagnitude;
+            lastAcceleration = acceleration;
         }
     }
 

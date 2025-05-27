@@ -38,6 +38,9 @@
             android:theme="@style/Theme.HealthTrackerApp" />
         <activity android:name=".view.activity.TabLayoutActivity" />
         <activity android:name=".view.activity.RegisterActivity" />
+        <activity
+            android:name=".view.activity.AddManualWorkoutLogActivity"
+            android:exported="false" />
 
         <service
             android:name=".service.WorkoutTrackingService"

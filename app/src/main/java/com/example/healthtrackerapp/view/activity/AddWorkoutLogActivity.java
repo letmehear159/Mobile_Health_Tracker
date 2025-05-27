@@ -26,6 +26,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.example.healthtrackerapp.R;
 import com.example.healthtrackerapp.service.WorkoutTrackingService;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class AddWorkoutLogActivity extends AppCompatActivity {
     private static final String TAG = "AddWorkoutLogActivity";
@@ -36,6 +37,7 @@ public class AddWorkoutLogActivity extends AppCompatActivity {
 
     private Spinner workoutTypeSpinner;
     private MaterialButton startTrackingButton;
+    private FloatingActionButton addManualButton;
     private TextView statusText;
     private TextView stepsText;
     private TextView caloriesText;
@@ -73,6 +75,7 @@ public class AddWorkoutLogActivity extends AppCompatActivity {
         // Initialize views
         workoutTypeSpinner = findViewById(R.id.workoutTypeSpinner);
         startTrackingButton = findViewById(R.id.startTrackingButton);
+        addManualButton = findViewById(R.id.addManualButton);
         statusText = findViewById(R.id.statusText);
         stepsText = findViewById(R.id.stepsText);
         caloriesText = findViewById(R.id.caloriesText);
@@ -98,6 +101,11 @@ public class AddWorkoutLogActivity extends AppCompatActivity {
             } else {
                 stopTracking();
             }
+        });
+
+        addManualButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddManualWorkoutLogActivity.class);
+            startActivity(intent);
         });
 
         // Setup broadcast receiver for stats updates
