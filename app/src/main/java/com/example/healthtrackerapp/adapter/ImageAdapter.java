@@ -2,12 +2,14 @@ package com.example.healthtrackerapp.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,21 +42,43 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position) {
         FileItem item = items.get(position);
         String fileUrl = item.getUrl();
+        String fileName = item.getName() != null ? item.getName() : "Không rõ tên";
 
-        // Hiển thị tên file và thời gian
-        holder.fileNameText.setText(item.getName() != null ? item.getName() : "Không rõ tên");
+        // Hiển thị tên và ngày
+        holder.fileNameText.setText(fileName);
         String formattedDate = DateFormat.format("dd/MM/yyyy HH:mm", new Date(item.getTimestampMillis())).toString();
         holder.fileDateText.setText(formattedDate);
 
+        // Xác định loại file
         if (fileUrl.endsWith(".pdf")) {
-            holder.imageView.setImageResource(R.drawable.pdf); // cần thêm icon PDF vào drawable
+            holder.imageView.setVisibility(View.VISIBLE);
+            holder.imageView.setImageResource(R.drawable.pdf);
             holder.imageView.setOnClickListener(v -> {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(android.net.Uri.parse(fileUrl), "application/pdf");
+                intent.setDataAndType(Uri.parse(fileUrl), "application/pdf");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 context.startActivity(intent);
             });
+
+        } else if (fileUrl.endsWith(".mp4") || fileUrl.endsWith(".mov") || fileUrl.endsWith(".3gp")) {
+            holder.imageView.setVisibility(View.VISIBLE);
+
+            // Hiển thị thumbnail video bằng Glide (nó lấy khung đầu)
+            Glide.with(context)
+                    .load(fileUrl)
+                    .thumbnail(0.1f) // lấy khung đầu
+                    .into(holder.imageView);
+
+            holder.imageView.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.parse(fileUrl), "video/*");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                context.startActivity(intent);
+            });
+
         } else {
+            // Ảnh
+            holder.imageView.setVisibility(View.VISIBLE);
             Glide.with(context).load(fileUrl).into(holder.imageView);
             holder.imageView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, FullScreenImageActivity.class);
@@ -64,14 +88,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
     }
 
+
+
     @Override
     public int getItemCount() {
         return items.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        TextView fileNameText, fileDateText;
+        public ImageView imageView;
+        public TextView fileNameText;
+        public TextView fileDateText;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -79,5 +106,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             fileNameText = itemView.findViewById(R.id.file_name);
             fileDateText = itemView.findViewById(R.id.file_date);
         }
+
     }
 }

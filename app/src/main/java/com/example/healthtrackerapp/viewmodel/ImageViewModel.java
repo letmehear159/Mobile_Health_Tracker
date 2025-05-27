@@ -49,7 +49,7 @@ public class ImageViewModel extends ViewModel {
                 });
     }
 
-    public void uploadImageToCloudinary(Context context, Uri imageUri, String fileName) {
+    public void uploadFileToCloudinary(Context context, Uri imageUri, String fileName) {
         repository.uploadFile(context, imageUri, fileName, uploadedItem -> {
             List<FileItem> current = fileItems.getValue();
             if (current == null) current = new ArrayList<>();

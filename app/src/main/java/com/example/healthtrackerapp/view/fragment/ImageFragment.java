@@ -9,9 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -25,13 +23,6 @@ import com.example.healthtrackerapp.R;
 import com.example.healthtrackerapp.adapter.ImageAdapter;
 import com.example.healthtrackerapp.viewmodel.ImageViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ImageFragment extends Fragment {
     private static final int REQUEST_PERMISSIONS = 123;
@@ -113,7 +104,7 @@ public class ImageFragment extends Fragment {
     private void openFilePicker() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
-        String[] mimeTypes = {"image/*", "application/pdf"};
+        String[] mimeTypes = {"image/*", "application/pdf", "video/*"};
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); // nếu muốn chọn nhiều
@@ -131,7 +122,7 @@ public class ImageFragment extends Fragment {
 
         builder.setPositiveButton("Tải lên", (dialog, which) -> {
             String customName = input.getText().toString().trim();
-            imageViewModel.uploadImageToCloudinary(requireContext(), fileUri, customName);
+            imageViewModel.uploadFileToCloudinary(requireContext(), fileUri, customName);
         });
 
         builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
