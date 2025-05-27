@@ -14,16 +14,14 @@ import java.util.List;
 public class AppointmentViewModel extends AndroidViewModel {
 
     private AppointmentRepository repository;
-    private LiveData<List<Appointment>> allAppointments;
 
     public AppointmentViewModel(@NonNull Application application) {
         super(application);
         repository = new AppointmentRepository(application);
-        allAppointments = repository.getAllAppointments();
     }
 
-    public LiveData<List<Appointment>> getAllAppointments() {
-        return allAppointments;
+    public LiveData<List<Appointment>> getAppointmentsForUser(String userId) {
+        return repository.getAppointmentsForUser(userId);
     }
 
     public void insert(Appointment appointment) {
@@ -37,5 +35,5 @@ public class AppointmentViewModel extends AndroidViewModel {
     public void update(Appointment appointment) {
         repository.update(appointment);
     }
-
 }
+
