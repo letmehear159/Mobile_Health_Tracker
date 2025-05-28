@@ -21,17 +21,15 @@ public class TabPagerAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         switch (position) {
-            case 0: return new HomeFragment();
-            case 1: return new ChartFragment();
-            case 2: return new SearchFragment();
-            case 3: return new ImageFragment();
-            case 4: return new AppointmentFragment();
-            default: return new HomeFragment(); // fallback
+            case 0: return new ChartFragment();
+            case 1: return new ImageFragment();
+            case 2: return new AppointmentFragment();
+            default: return new ChartFragment(); // fallback
         }
     }
 
     @Override
     public int getItemCount() {
-        return 5;
+        return 3;
     }
 }

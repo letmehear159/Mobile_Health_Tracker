@@ -25,11 +25,9 @@ public class TabLayoutActivity extends AppCompatActivity {
     private FloatingActionButton fabChat;
 
     private final int[] tabIcons = {
-            R.drawable.home,
-            R.drawable.statistic,
-            R.drawable.search,  // Tab giữa - sẽ làm nổi
-            R.drawable.camera,
-            R.drawable.user
+            R.drawable.report,
+            R.drawable.image_gallery,
+            R.drawable.doctor
     };
 
     @Override
