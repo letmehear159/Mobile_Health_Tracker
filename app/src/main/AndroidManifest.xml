@@ -54,6 +54,8 @@
             android:name=".view.activity.ChatActivity"
             android:exported="false"
             android:label="Health Assistant" />
+
+        <activity android:name=".view.activity.CreateAppointmentActivity"/>
     </application>
 
 </manifest>
