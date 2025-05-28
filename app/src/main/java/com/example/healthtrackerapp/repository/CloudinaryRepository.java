@@ -13,19 +13,26 @@ import com.example.healthtrackerapp.model.FileItem;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CloudinaryRepository {
 
-    public interface UploadCallbackInterface {
-        void onUploadSuccess(FileItem item);
+    public interface LoadCallbackInterface {
+        void onUploadSuccess(List<FileItem> items);
+
+        void onLoadFailure(Exception e);
     }
 
-    public void uploadFile(Context context, Uri fileUri, String customFileName, UploadCallbackInterface callback) {
+    public void uploadFile(Context context, Uri fileUri, String customFileName, LoadCallbackInterface callback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
@@ -77,8 +84,10 @@ public class CloudinaryRepository {
                                             finalFileName,
                                             Timestamp.now() // dùng thời gian hiện tại, do serverTimestamp bất đồng bộ
                                     );
+                                    List<FileItem> items = new ArrayList<>(List.of(item));
+
                                     if (callback != null) {
-                                        callback.onUploadSuccess(item);
+                                        callback.onUploadSuccess(items);
                                     }
                                 })
                                 .addOnFailureListener(e ->
@@ -98,6 +107,33 @@ public class CloudinaryRepository {
                 .dispatch(context);
     }
 
+    public void loadImagesFromFirestore(LoadCallbackInterface callback) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        String userId = user.getUid();
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .collection("uploads")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<FileItem> items = new ArrayList<>();
+                    for (DocumentSnapshot doc : querySnapshot) {
+                        String url = doc.getString("url");
+                        String name = doc.getString("name");
+                        Timestamp timestamp = doc.getTimestamp("timestamp");
+                        if (url != null && timestamp != null) {
+                            items.add(new FileItem(url, name != null ? name : "Unknown", timestamp));
+                        }
+                    }
+                    if (callback != null) callback.onUploadSuccess(items);
+                })
+                .addOnFailureListener(e -> {
+                    if (callback != null) callback.onLoadFailure(e);
+                });
+    }
 
     // Utility để lấy tên file thật từ Uri (cả PDF và ảnh)
     private String getFileName(Context context, Uri uri) {

@@ -2,6 +2,7 @@ package com.example.healthtrackerapp.viewmodel;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -28,34 +29,41 @@ public class ImageViewModel extends ViewModel {
     }
 
     public void loadImagesFromFirestore() {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(userId)
-                .collection("uploads")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<FileItem> items = new ArrayList<>();
-                    for (DocumentSnapshot doc : querySnapshot) {
-                        String url = doc.getString("url");
-                        String name = doc.getString("name"); // có thể null
-                        Timestamp timestamp = doc.getTimestamp("timestamp");
-                        if (url != null && timestamp != null) {
-                            items.add(new FileItem(url, name != null ? name : "Unknown", timestamp));
-                        }
-                    }
-                    fileItems.setValue(items);
-                });
+        repository.loadImagesFromFirestore(new CloudinaryRepository.LoadCallbackInterface() {
+            @Override
+            public void onUploadSuccess(List<FileItem> items) {
+                fileItems.setValue(items);
+            }
+
+            @Override
+            public void onLoadFailure(Exception e) {
+                Log.e("ImageViewModel", "Lỗi tải hình từ Firestore", e);
+            }
+        });
     }
 
     public void uploadFileToCloudinary(Context context, Uri imageUri, String fileName) {
-        repository.uploadFile(context, imageUri, fileName, uploadedItem -> {
-            List<FileItem> current = fileItems.getValue();
-            if (current == null) current = new ArrayList<>();
-            current.add(0, uploadedItem); // Thêm file mới vào đầu danh sách
-            fileItems.postValue(current);
+        repository.uploadFile(context, imageUri, fileName, new CloudinaryRepository.LoadCallbackInterface() {
+            @Override
+            public void onUploadSuccess(List<FileItem> uploadedItems) {
+                if (uploadedItems != null && !uploadedItems.isEmpty()) {
+                    FileItem uploadedItem = uploadedItems.get(0); // lấy item đầu tiên (chỉ có 1 file được upload)
+
+                    List<FileItem> currentList = fileItems.getValue();
+                    List<FileItem> updatedList = currentList != null ? new ArrayList<>(currentList) : new ArrayList<>();
+
+                    updatedList.add(0, uploadedItem);
+                    fileItems.postValue(updatedList);
+                }
+            }
+
+            @Override
+            public void onLoadFailure(Exception e) {
+                Log.e("ImageViewModel", "Lỗi upload file lên Cloudinary/Firestore", e);
+            }
         });
     }
+
+
 
 }
